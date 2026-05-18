@@ -87,4 +87,4 @@ See [DESIGN.md](./DESIGN.md) for the design notes.
 
 ## License
 
-This source is available under the [PolyForm Noncommercial License 1.0.0](./LICENSE). You may download, copy, modify, and share it for noncommercial purposes. Commercial use is not permitted without separate written permission.
+This source is available under the [MIT License](./LICENSE).

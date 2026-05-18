@@ -1,6 +1,6 @@
 {
   "name": "@majorgilles/pi-grill-me",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Socratic planning and shared-understanding sessions for pi.",
   "type": "module",
   "keywords": [
@@ -36,5 +36,5 @@
     "README.md",
     "DESIGN.md"
   ],
-  "license": "PolyForm-Noncommercial-1.0.0"
+  "license": "MIT"
 }
