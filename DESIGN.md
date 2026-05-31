@@ -12,7 +12,7 @@ The extension should be useful both for:
 ## Core Principles
 
 1. **Shared understanding first**: the goal is not to immediately implement, but to converge on a clear, useful understanding of the user's intent.
-2. **Thorough by default**: there are no soft/hard/adversarial modes. Grill Me uses one thorough, collaborative Socratic style that asks enough follow-up questions to resolve or intentionally defer major branches before readiness.
+2. **Thorough by default**: Grill Me uses one thorough, collaborative Socratic style that asks enough follow-up questions to resolve or intentionally defer major branches before readiness.
 3. **Adaptive interview, hardcoded ending**: avoid fixed product/UX/architecture interview phases. Use adaptive dimensions such as objective, constraints, outcome mode, risks, tradeoffs, unknowns, and next steps. The final output-selection phase is the one mandatory hardcoded phase before stopping or producing outputs.
 4. **Mostly one question at a time**: default pacing asks one focused question per assistant turn, with small grouped questions allowed only when inseparable.
 5. **Alternatives included by default**: each grill question should include 2-5 concrete answer alternatives, including the assistant's recommended answer, and expose them through Tab reply selection.
@@ -164,7 +164,7 @@ On session start/resume, restore the latest state entry from the current branch.
 When active, `before_agent_start` appends grill instructions to the system prompt:
 
 - apply Socratic method,
-- use one thorough default style instead of optional soft/hard/intensity modes,
+- use one thorough default style,
 - ask mostly one question at a time,
 - ask enough follow-up questions to resolve the decision tree instead of rushing to output selection,
 - include 2-5 concrete answer alternatives and a recommended answer by default,
