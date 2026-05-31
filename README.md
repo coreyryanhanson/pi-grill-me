@@ -1,6 +1,6 @@
 # Pi Grill Me
 
-A pi extension for Socratic planning sessions. It keeps a shared-understanding checkpoint, asks one focused question at a time, offers Tab-cyclable answer alternatives, forces a mandatory output-selection phase at the end of the interview, and blocks implementation mutations until output production is explicitly approved.
+A pi extension for thorough Socratic planning sessions. It keeps a shared-understanding checkpoint, asks one focused question at a time, tracks coverage and decision branches, offers Tab-cyclable answer alternatives, forces a mandatory output-selection phase at the end of the interview, and blocks implementation mutations until output production is explicitly approved.
 
 ## Install
 
@@ -22,7 +22,6 @@ pi -e git:github.com/majorgilles/pi-grill-me
 - `/checkpoint [edit|chat]` — show the current checkpoint in an overlay by default; use `edit` to edit or `chat` to print it.
 - `/grill checkpoint [edit|chat]` — same checkpoint controls from the `/grill` command.
 - `/grill status` — show current grill state.
-- `/grill intensity gentle|standard|hard|adversarial` — set Socratic intensity.
 - `/grill intent auto|plan|learn|research|content|decide` — set the intent preset.
 - `/grill output <outputs>` — set one or more preferred output formats, such as `github-issues`, `design-doc`, `readme`, `adr`, `prd`, `summary`, or `design-doc,github-issues`. This is a preference only; Grill Me still explicitly asks/gets approval before producing outputs.
 - `/grill research off|ask|auto` — configure whether the assistant should inspect/research while grilling.
@@ -38,7 +37,7 @@ While active, the extension injects Grill Me instructions into the agent context
 - `grill_enter_output_phase`
 - `grill_finish_output_phase`
 
-During interview mode it blocks `edit`, `write`, and bash commands that appear mutating. Grill Me does not assume a default output mode; when the interview is ready to end, the assistant must enter the hardcoded output-selection phase, ask which output(s) to produce, and support one or many outputs, such as a design doc and uploaded GitHub issues. Output production can only start after the user approves a concrete plan from that selection phase; choosing to continue grilling or stop without output is recorded separately.
+During interview mode it blocks `edit`, `write`, and bash commands that appear mutating. Grill Me uses one thorough default grilling style rather than optional soft/hard intensity modes. The assistant is instructed to maintain a coverage checklist and decision-branch ledger in the checkpoint, ask enough follow-up questions to resolve or intentionally defer major branches, and avoid premature readiness. Grill Me does not assume a default output mode; when the interview is ready to end, the assistant must enter the hardcoded output-selection phase, ask which output(s) to produce, and support one or many outputs, such as a design doc and uploaded GitHub issues. Output production can only start after the user approves a concrete plan from that selection phase; choosing to continue grilling or stop without output is recorded separately.
 
 ## Tab reply selection
 

@@ -12,12 +12,13 @@ The extension should be useful both for:
 ## Core Principles
 
 1. **Shared understanding first**: the goal is not to immediately implement, but to converge on a clear, useful understanding of the user's intent.
-2. **Adaptive interview, hardcoded ending**: avoid fixed product/UX/architecture interview phases. Use adaptive dimensions such as objective, constraints, outcome mode, risks, tradeoffs, unknowns, and next steps. The final output-selection phase is the one mandatory hardcoded phase before stopping or producing outputs.
-3. **Mostly one question at a time**: default pacing asks one focused question per assistant turn, with small grouped questions allowed only when inseparable.
-4. **Alternatives included by default**: each grill question should include 2-5 concrete answer alternatives, including the assistant's recommended answer, and expose them through Tab reply selection.
-5. **Stateful memory**: maintain a single evolving Markdown checkpoint representing current shared understanding.
-6. **Automatic checkpointing**: whenever shared understanding changes meaningfully, the assistant must update the checkpoint before asking the next question.
-7. **Read-only during grilling**: while interviewing/planning, the extension blocks implementation mutations. Output selection is a mandatory workflow step before the session can end or output production can begin. Output production is a deliberate approved phase and can temporarily use the tools required for that output.
+2. **Thorough by default**: there are no soft/hard/adversarial modes. Grill Me uses one thorough, collaborative Socratic style that asks enough follow-up questions to resolve or intentionally defer major branches before readiness.
+3. **Adaptive interview, hardcoded ending**: avoid fixed product/UX/architecture interview phases. Use adaptive dimensions such as objective, constraints, outcome mode, risks, tradeoffs, unknowns, and next steps. The final output-selection phase is the one mandatory hardcoded phase before stopping or producing outputs.
+4. **Mostly one question at a time**: default pacing asks one focused question per assistant turn, with small grouped questions allowed only when inseparable.
+5. **Alternatives included by default**: each grill question should include 2-5 concrete answer alternatives, including the assistant's recommended answer, and expose them through Tab reply selection.
+6. **Stateful memory**: maintain a single evolving Markdown checkpoint representing current shared understanding, including coverage and decision-branch status when useful.
+7. **Automatic checkpointing**: whenever shared understanding changes meaningfully, the assistant must update the checkpoint before asking the next question.
+8. **Read-only during grilling**: while interviewing/planning, the extension blocks implementation mutations. Output selection is a mandatory workflow step before the session can end or output production can begin. Output production is a deliberate approved phase and can temporarily use the tools required for that output.
 
 ## User Experience
 
@@ -45,14 +46,13 @@ The user interacts through normal chat, not a rigid wizard. The extension adds:
 - `/grill stop`: stop grill mode and clear active status.
 - `/grill checkpoint`: review the current Markdown checkpoint; supports quick display and editable review.
 - `/grill status`: show operational state.
-- `/grill intensity <gentle|standard|hard|adversarial>`: set intensity. Default: `standard`.
 - `/grill intent <auto|plan|learn|research|content|decide>`: set intent preset. Default: `auto`.
 - `/grill output <outputs>`: set one or more output preferences, e.g. `github-issues`, `design-doc`, `readme`, `adr`, `prd`, `summary`, or comma-separated combinations. This preference is never production approval; the assistant still explicitly asks/confirm outputs later.
 - `/grill research <off|ask|auto>`: set research behavior. Default: `auto`.
 
 ### Checkpoint
 
-The checkpoint is a single adaptive Markdown document. It should start generic, but sections may be added/removed based on the topic.
+The checkpoint is a single adaptive Markdown document. It should start generic, but sections may be added/removed based on the topic. For thorough grilling, the assistant should maintain a lightweight coverage checklist and decision-branch ledger when useful, marking branches resolved, open, contradicted, or intentionally deferred.
 
 Example sections:
 
@@ -70,6 +70,10 @@ Example sections:
 ## Constraints
 
 ## Risks / Unknowns
+
+## Coverage Checklist
+
+## Decision Branches
 
 ## Open Questions
 
@@ -141,7 +145,6 @@ State fields:
 - `active`: whether grill mode is active.
 - `topic`: current topic.
 - `intent`: `auto | plan | learn | research | content | decide`.
-- `intensity`: `gentle | standard | hard | adversarial`.
 - `outputPreference`: user-provided output preference(s), if any. Empty means unset; it must not imply a default.
 - `researchMode`: `off | ask | auto`.
 - `checkpoint`: evolving Markdown shared-understanding document.
@@ -161,14 +164,17 @@ On session start/resume, restore the latest state entry from the current branch.
 When active, `before_agent_start` appends grill instructions to the system prompt:
 
 - apply Socratic method,
+- use one thorough default style instead of optional soft/hard/intensity modes,
 - ask mostly one question at a time,
+- ask enough follow-up questions to resolve the decision tree instead of rushing to output selection,
 - include 2-5 concrete answer alternatives and a recommended answer by default,
 - call `grill_set_alternatives` before each question so Tab can fill/cycle those alternatives and Enter can send the selected or edited reply,
 - adapt dimensions to topic and intent,
+- maintain coverage checklist and decision-branch status in the checkpoint when useful,
 - inspect code/files instead of asking when research mode allows and the answer is discoverable,
 - do not implement during interview,
 - update checkpoint with `grill_update_checkpoint` before the next question whenever shared understanding changes,
-- when ready, call `grill_enter_output_selection_phase` to enter the mandatory hardcoded output-selection phase, explicitly list concrete output options (GitHub issues, design doc, README.md, ADR doc, PRD, etc.), ask for one or more outputs/continue/review/stop, and wait for the user's selection,
+- when major coverage branches are resolved or intentionally deferred, call `grill_enter_output_selection_phase` to enter the mandatory hardcoded output-selection phase, explicitly list concrete output options (GitHub issues, design doc, README.md, ADR doc, PRD, etc.), ask for one or more outputs/continue/review/stop, and wait for the user's selection,
 - after output approval from that phase, call `grill_enter_output_phase` before using mutating tools,
 - during output phase, perform only approved mutations; if a permission/authentication/tool gate blocks an approved mutation, ask the user for the needed permission, confirmation, credentials, or plan change instead of refusing the approved output or bypassing the gate,
 - for approved GitHub issue output with no git repo or remote, ask to initialize/create/select a repo/remote before creating the previewed issues,
@@ -276,7 +282,7 @@ When `outputPhase` is true, the assistant may use tools required for the approve
 The first working version implements:
 
 - stateful `/grill` command,
-- v1 config commands,
+- config commands for intent, research behavior, and output preference,
 - prompt injection,
 - persistent Markdown checkpoint,
 - `grill_update_checkpoint`,
