@@ -6,7 +6,7 @@ A pi extension for thorough Socratic planning sessions. It keeps a shared-unders
 
 ### Forked version
 
-This extension is a fork modified from the github.com/majorgilles/pi-grill-me plugin, using the pi-tool-masking library to automatically keep the grill tools out of the context unless a user initiates a /grill session. Enabled tools are tied to chat state and will not be disabled from a conversation until the grill session ends or a user manually disables them using another plugin. You can install it with the following command.
+This extension is a fork modified from the github.com/majorgilles/pi-grill-me plugin, using the pi-tool-masking library to automatically keep the grill tools out of the context unless a user initiates a /grill session. Enabled tools are tied to chat state and will not be disabled from a conversation unless a user manually disables them using another plugin. You can install it with the following command.
 
 ```bash
 pi install git:github.com/coreyryanhanson/pi-grill-me

@@ -631,7 +631,6 @@ export default function grillMeExtension(pi: ExtensionAPI): void {
 
 			if (command === "stop") {
 				state.active = false;
-				grillToolset.disable(pi);
 				state.phase = "interview";
 				state.outputPhase = false;
 				state.outputSelection = undefined;
@@ -928,7 +927,6 @@ export default function grillMeExtension(pi: ExtensionAPI): void {
 
 			if (outcome === "stop-without-output" || outcome === "stop" || outcome === "no-output" || outcome === "none") {
 				state.active = false;
-				grillToolset.disable(pi);
 				state.phase = "interview";
 				state.outputPhase = false;
 				state.outputSelection = undefined;
