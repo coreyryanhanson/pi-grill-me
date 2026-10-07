@@ -12,7 +12,7 @@ import {
 	type TUI,
 } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
-import { defineToolset, getDefaultResolutionMode } from "pi-tool-masking";
+import { defineToolset } from "pi-tool-masking";
 
 type Intent = "auto" | "plan" | "learn" | "research" | "content" | "decide";
 type ResearchMode = "off" | "ask" | "auto";
@@ -695,14 +695,6 @@ export default function grillMeExtension(pi: ExtensionAPI): void {
 				return;
 			}
 
-			if (getDefaultResolutionMode() === "allowlist" && !grillToolset.isEnabled(pi)) {
-				ctx.ui.notify(
-					"Grill tools are masked by an active tool allowlist (focus mode) from another plugin. Turn that allowlist off or add pi-grill-me.tools to it to start a grill session.",
-					"warning",
-				);
-				return;
-			}
-
 			const parsed = parseArgs(trimmed);
 			const partial: Partial<GrillState> = {};
 			const intent = asIntent(parsed.flags.intent);
@@ -726,7 +718,18 @@ export default function grillMeExtension(pi: ExtensionAPI): void {
 				}
 			}
 
-			grillToolset.enable(pi);
+			try {
+				grillToolset.enable(pi, ctx.sessionManager);
+			} catch (err: any) {
+				if (err?.name === "AllowlistModeError") {
+					ctx.ui.notify(
+						"Grill tools are masked by an active tool allowlist (focus mode) from another plugin. Turn that allowlist off or add pi-grill-me.tools to it to start a grill session.",
+						"warning",
+					);
+					return;
+				}
+				throw err;
+			}
 
 			startSession(topic, ctx, partial);
 		},
