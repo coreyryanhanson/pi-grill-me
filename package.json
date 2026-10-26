@@ -1,6 +1,6 @@
 {
   "name": "@majorgilles/pi-grill-me",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Socratic planning and shared-understanding sessions for pi.",
   "type": "module",
   "keywords": [
@@ -21,6 +21,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": ">=22.19"
+  },
   "pi": {
     "extensions": [
       "./index.ts"
@@ -36,8 +39,12 @@
   },
   "files": [
     "index.ts",
+    "grill-prompt.ts",
     "README.md",
     "DESIGN.md"
   ],
+  "scripts": {
+    "test": "node --test grill-prompt.test.ts"
+  },
   "license": "MIT"
 }

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -27,7 +28,40 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
+      - name: Run tests for packages with a test script
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t manifests < <(
+            find . -name package.json \
+              -not -path "*/.git/*" \
+              -not -path "*/node_modules/*" \
+              -not -path "*/dist/*" \
+              -not -path "*/build/*" \
+              -print | sort
+          )
+
+          for manifest in "${manifests[@]}"; do
+            package_dir="$(dirname "$manifest")"
+            has_test="$(node -p \
+              "Boolean(require(process.argv[1]).scripts?.test)" "$manifest")"
+            if [ "$has_test" = "true" ]; then
+              echo "Running tests in $package_dir"
+              (cd "$package_dir" && npm test)
+            fi
+          done
+
+      - name: Typecheck extension entrypoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx -p typescript tsc --noEmit --target ES2022 --module NodeNext \
+            --moduleResolution NodeNext --allowImportingTsExtensions \
+            --skipLibCheck index.ts
+
       - name: Publish unpublished pi extension packages and releases
+        if: github.event_name != 'pull_request'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GH_TOKEN: ${{ github.token }}

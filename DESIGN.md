@@ -161,7 +161,40 @@ On session start/resume, restore the latest state entry from the current branch.
 
 ### Prompt Injection
 
-When active, `before_agent_start` appends grill instructions to the system prompt:
+When active, grill text reaches the model through two channels, split by cache impact so that
+per-turn state changes never invalidate the cached conversation prefix.
+
+**Static rules — the `grill_rules` named prompt section (head system prompt).** At
+`before_agent_start`, the extension sets the `grill_rules` section in
+`systemPromptOptions.sections`, containing the phase-independent behavior rules (Socratic
+method, one thorough default style, question discipline, alternatives via
+`grill_set_alternatives`, checkpoint discipline, the mandatory output-selection phase and its
+gates: readiness gate, mandatory-ask rule, approval precondition before mutations). The text
+is a module-load constant with no state interpolation, so the head system prompt is
+byte-stable for the whole session and changes only at `/grill` start and stop. pi diffs named
+sections by name and emits one delta on add or remove; each delta is persisted as a system
+message in the transcript. If another extension force-sets the whole system prompt, pi ignores
+sections and the extension appends the rules to the forced text while active (when inactive, a
+forced prompt is left untouched). When inactive, the section is removed on the next run — one
+removal delta, then the head is stable again.
+
+**Per-request state — the `<grill-state>` block (last user message).** On every provider
+request, a `context` handler appends a tagged `<grill-state>` block to the content of the
+last user (or extension `custom`) message of the cloned transcript; nothing is persisted to
+history. The block carries the phase- and research-mode-conditional guidance (interview
+mutation ban, output-selection shape, output-phase workflow and permission gates, research
+mode) plus the current state facts (topic, configuration, checkpoint, alternatives,
+output-selection summary). It is labeled as injected by the grill-me extension, not written
+by the user; the assistant-authored checkpoint and alternatives content is fenced inside it
+with a fence longer than any embedded backtick run, and a literal `</grill-state>` inside
+that content is escaped. The anchor is the last user message, or the last extension `custom`
+message when agent traffic separates it from the preceding user message (a custom directly
+following the user's message is a foreign annotation and is left alone). Because the block is
+re-derived from state on every request, it survives compaction, retries are idempotent, and
+mid-run phase transitions are visible to the very next request. A state change mid-turn (for
+example a checkpoint update) re-processes the current turn, not the whole conversation.
+
+The grill behavior rules (static in `grill_rules`, or phase-conditional in the state block):
 
 - apply Socratic method,
 - use one thorough default style,

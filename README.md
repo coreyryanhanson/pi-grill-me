@@ -85,12 +85,15 @@ Kudos to [Matt Pocock](https://github.com/mattpocock) for the idea that inspired
 
 ## Testing
 
-This package currently has no npm scripts. Useful checks:
+Useful checks:
 
 ```bash
+npm test
 npm pack --dry-run
-tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck index.ts
+tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --skipLibCheck index.ts
 ```
+
+`npm test` runs the unit tests for the pi-free `grill-prompt.ts` module with `node --test` (requires Node ≥ 22.19).
 
 The TypeScript check requires pi peer dependencies to be resolvable in the local environment.
 
